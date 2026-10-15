@@ -313,7 +313,7 @@
         </div>
 
         <!-- Controles Táctiles para Móviles y Tablets -->
-        <section class="flex md:hidden items-center justify-between mt-3 px-2" aria-label="Controles táctiles">
+        <section id="touchControls" class="hidden items-center justify-between mt-3 px-2" aria-label="Controles táctiles">
             <div class="flex items-center gap-3">
                 <button id="touchLeft" class="touch-btn" aria-label="Izquierda">◀</button>
                 <button id="touchRight" class="touch-btn" aria-label="Derecha">▶</button>
@@ -574,7 +574,10 @@
                 const press = (e) => {
                     e.preventDefault();
                     btn.classList.add('active');
-                    if (keyName === 'jump' && !keys.jump) keys.jumpJustPressed = true;
+                    if (keyName === 'jump' && !keys.jump) {
+                        keys.jumpJustPressed = true;
+                        if (gameState.mode === 'START') startGame();
+                    }
                     keys[keyName] = true;
                     sfx.init();
                 };
@@ -595,6 +598,15 @@
             bindTouchButton('touchRight', 'right');
             bindTouchButton('touchJump', 'jump');
             bindTouchButton('touchRun', 'run');
+
+            // Mostrar los controles táctiles en CUALQUIER dispositivo con pantalla táctil
+            // (celulares, tablets y laptops táctiles), incluso en orientación horizontal.
+            const touchControls = document.getElementById('touchControls');
+            const isTouchDevice = ('ontouchstart' in window) || navigator.maxTouchPoints > 0 || window.matchMedia('(any-pointer: coarse)').matches;
+            if (isTouchDevice) {
+                touchControls.classList.remove('hidden');
+                touchControls.classList.add('flex');
+            }
 
             // =========================================================================
             // 3. ESTADO GLOBAL DEL JUEGO Y ENTIDADES DEL NIVEL 1-1
@@ -1517,7 +1529,7 @@
                     ctx.fillText('JUEGO EN PAUSA', GAME_WIDTH / 2, GAME_HEIGHT / 2 - 10);
                     ctx.font = '11px "Press Start 2P", monospace';
                     ctx.fillStyle = '#ffffff';
-                    ctx.fillText('PRESIONA [P] PARA CONTINUAR', GAME_WIDTH / 2, GAME_HEIGHT / 2 + 24);
+                    ctx.fillText('PULSA PAUSA O [P] PARA CONTINUAR', GAME_WIDTH / 2, GAME_HEIGHT / 2 + 24);
                     ctx.textAlign = 'left';
                 }
             }
