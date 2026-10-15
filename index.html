@@ -2,8 +2,8 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Super Marco Bros - Edición Retro HTML5</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Super Marco Bros - Edición Retro</title>
     <!-- Tailwind CSS para utilidades de maquetación responsiva -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Fuente Pixel Art clásica de Google Fonts -->
@@ -25,43 +25,53 @@
             box-sizing: border-box;
             user-select: none;
             -webkit-user-select: none;
+            -webkit-touch-callout: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        body {
+        html, body {
             margin: 0;
             padding: 0;
+            width: 100%;
+            height: 100dvh;
+            overflow: hidden;
+            touch-action: none;
             background: radial-gradient(circle at center, #1e293b 0%, #090d16 100%);
             font-family: 'Press Start 2P', monospace;
             color: #ffffff;
-            min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            overflow-x: hidden;
         }
 
         /* Marco estilo consola Arcade / NES */
         .arcade-wrapper {
             background: var(--cabinet-dark);
-            border: 4px solid var(--cabinet-border);
+            border: 3px solid var(--cabinet-border);
             border-radius: 16px;
             box-shadow: 
-                0 20px 50px rgba(0, 0, 0, 0.8),
+                0 16px 40px rgba(0, 0, 0, 0.85),
                 0 0 0 2px #000,
                 inset 0 2px 4px rgba(255, 255, 255, 0.1);
-            padding: 12px;
+            padding: 10px;
             max-width: 860px;
-            width: 96vw;
+            width: 98vw;
+            max-height: 98dvh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
 
-        /* Contenedor del Canvas con relación de aspecto 16:9 (800x450) */
+        /* Contenedor del Lienzo con relación de aspecto 16:9 (800x450) */
         .canvas-container {
             position: relative;
             width: 100%;
             aspect-ratio: 16 / 9;
+            max-height: 58dvh;
+            margin: 0 auto;
             background-color: var(--sky-blue);
-            border: 4px solid #000;
+            border: 3px solid #000;
             border-radius: 8px;
             overflow: hidden;
             box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.35);
@@ -92,43 +102,44 @@
         .hud-bar {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            gap: 6px;
+            gap: 4px;
             background: #0b0e17;
             border: 2px solid #283046;
             border-radius: 8px;
-            padding: 10px 12px;
-            margin-bottom: 10px;
+            padding: 6px 8px;
+            margin-bottom: 6px;
             text-align: center;
         }
 
         .hud-label {
-            font-size: clamp(8px, 1.3vw, 11px);
+            font-size: clamp(7px, 1.2vw, 10px);
             color: #94a3b8;
-            margin-bottom: 5px;
-            letter-spacing: 1px;
+            margin-bottom: 3px;
+            letter-spacing: 0.5px;
         }
 
         .hud-value {
-            font-size: clamp(10px, 1.6vw, 14px);
+            font-size: clamp(9px, 1.5vw, 13px);
             color: #ffffff;
             text-shadow: 2px 2px 0px #000;
         }
 
-        /* Botones estilo Arcade */
+        /* Botones superiores estilo Arcade */
         .retro-btn {
             font-family: 'Press Start 2P', monospace;
-            font-size: 10px;
-            padding: 8px 12px;
+            font-size: clamp(8px, 1.2vw, 10px);
+            padding: 6px 10px;
             border-radius: 6px;
             border: 2px solid #000;
             cursor: pointer;
             transition: transform 0.08s ease, filter 0.15s ease;
-            box-shadow: 0 4px 0 #000;
+            box-shadow: 0 3px 0 #000;
             text-transform: uppercase;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 6px;
+            gap: 5px;
+            touch-action: manipulation;
         }
 
         .retro-btn:hover {
@@ -136,7 +147,7 @@
         }
 
         .retro-btn:active {
-            transform: translateY(3px);
+            transform: translateY(2px);
             box-shadow: 0 1px 0 #000;
         }
 
@@ -159,14 +170,14 @@
         .overlay-screen {
             position: absolute;
             inset: 0;
-            background: rgba(10, 14, 23, 0.86);
+            background: rgba(10, 14, 23, 0.88);
             backdrop-filter: blur(3px);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             z-index: 10;
-            padding: 20px;
+            padding: 12px;
             text-align: center;
             transition: opacity 0.25s ease;
         }
@@ -176,51 +187,151 @@
             pointer-events: none;
         }
 
-        /* Controles táctiles para móvil / tablet */
-        .touch-btn {
-            width: 52px;
-            height: 52px;
-            border-radius: 12px;
-            background: rgba(255, 255, 255, 0.14);
-            border: 2px solid rgba(255, 255, 255, 0.35);
-            color: #fff;
-            font-size: 16px;
+        /* Panel de Mando Táctil Ergonómico (Celular y Tablet) */
+        .gamepad-deck {
             display: flex;
             align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 0 rgba(0, 0, 0, 0.6);
-            touch-action: manipulation;
+            justify-content: space-between;
+            background: linear-gradient(180deg, #1b2030 0%, #10131d 100%);
+            border: 2px solid #2e364f;
+            border-radius: 12px;
+            padding: 8px 14px;
+            margin-top: 8px;
+            touch-action: none;
         }
 
-        .touch-btn:active, .touch-btn.active {
-            background: rgba(251, 208, 0, 0.45);
-            border-color: #fbd000;
-            transform: translateY(2px);
+        .dpad-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #0b0e17;
+            padding: 6px;
+            border-radius: 14px;
+            border: 2px solid #262d42;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.7);
+        }
+
+        .action-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #0b0e17;
+            padding: 6px 10px;
+            border-radius: 30px;
+            border: 2px solid #262d42;
+            transform: rotate(-6deg);
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.7);
+        }
+
+        .touch-btn {
+            width: clamp(54px, 13vw, 68px);
+            height: clamp(50px, 11vw, 62px);
+            border-radius: 12px;
+            background: linear-gradient(180deg, #334155 0%, #1e293b 100%);
+            border: 2px solid #64748b;
+            color: #f8fafc;
+            font-family: 'Press Start 2P', monospace;
+            font-size: clamp(14px, 3vw, 18px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 0 #090d16;
+            cursor: pointer;
+            touch-action: none;
+            position: relative;
+        }
+
+        .touch-btn span.sub-label {
+            font-size: 7px;
+            margin-top: 3px;
+            color: #cbd5e1;
+            letter-spacing: 0.5px;
+        }
+
+        .touch-btn.btn-run {
+            border-radius: 50%;
+            width: clamp(54px, 13vw, 66px);
+            height: clamp(54px, 13vw, 66px);
+            background: linear-gradient(180deg, #f59e0b 0%, #b45309 100%);
+            border-color: #fde68a;
+            color: #111;
+        }
+
+        .touch-btn.btn-run span.sub-label {
+            color: #271202;
+        }
+
+        .touch-btn.btn-jump {
+            border-radius: 50%;
+            width: clamp(58px, 14vw, 70px);
+            height: clamp(58px, 14vw, 70px);
+            background: linear-gradient(180deg, #ef4444 0%, #991b1b 100%);
+            border-color: #fecaca;
+            color: #fff;
+        }
+
+        .touch-btn.btn-jump span.sub-label {
+            color: #ffe4e6;
+        }
+
+        .touch-btn.active {
+            transform: translateY(3px);
+            box-shadow: 0 1px 0 #090d16;
+            filter: brightness(1.22);
+            border-color: #ffffff;
         }
 
         kbd {
             background: #1e293b;
             border: 1px solid #475569;
-            border-bottom-width: 3px;
+            border-bottom-width: 2px;
             border-radius: 4px;
-            padding: 2px 6px;
-            font-size: 9px;
+            padding: 2px 5px;
+            font-size: 8px;
             color: #f8fafc;
+        }
+
+        /* Ajustes para móviles en modo horizontal (Landscape) de poca altura */
+        @media (max-height: 520px) and (orientation: landscape) {
+            .arcade-wrapper {
+                padding: 4px 8px;
+                border-width: 2px;
+            }
+            .hud-bar {
+                padding: 3px 6px;
+                margin-bottom: 4px;
+            }
+            .canvas-container {
+                max-height: 54dvh;
+            }
+            .gamepad-deck {
+                margin-top: 4px;
+                padding: 4px 10px;
+            }
+            .touch-btn, .touch-btn.btn-run, .touch-btn.btn-jump {
+                width: 46px;
+                height: 42px;
+                font-size: 12px;
+            }
+            .desktop-footer {
+                display: none !important;
+            }
         }
     </style>
 </head>
-<body class="p-2 sm:p-4">
+<body class="p-1 sm:p-3">
 
     <main class="arcade-wrapper">
         <!-- Encabezado y Controles Rápidos -->
-        <header class="flex flex-wrap items-center justify-between gap-2 mb-3 px-1">
+        <header class="flex items-center justify-between gap-2 mb-1.5 px-1">
             <div class="flex items-center gap-2">
-                <span class="inline-block w-3 h-3 rounded-full bg-red-500 animate-pulse"></span>
-                <h1 class="text-xs sm:text-sm md:text-base tracking-wider text-yellow-400 drop-shadow">
-                    SUPER MARCO BROS <span class="text-[10px] text-slate-400">1-1</span>
+                <span class="inline-block w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse"></span>
+                <h1 class="text-[10px] sm:text-xs md:text-sm tracking-wider text-yellow-400 drop-shadow">
+                    SUPER MARCO BROS <span class="text-[9px] text-slate-400">1-1</span>
                 </h1>
             </div>
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-1.5 sm:gap-2">
                 <button id="btnAudio" class="retro-btn btn-blue" title="Activar/Silenciar Sonido (Tecla M)">
                     <span id="audioIcon">🔊</span> <span id="audioText" class="hidden sm:inline">SONIDO</span>
                 </button>
@@ -236,12 +347,12 @@
         <!-- Barra HUD Superior Clásica -->
         <section class="hud-bar" aria-label="Marcadores del juego">
             <div>
-                <div class="hud-label">MARCO / PUNTOS</div>
+                <div class="hud-label">PUNTOS</div>
                 <div id="hudScore" class="hud-value text-yellow-300">000000</div>
             </div>
             <div>
                 <div class="hud-label">MONEDAS</div>
-                <div id="hudCoins" class="hud-value text-amber-400">🪙 x00</div>
+                <div id="hudCoins" class="hud-value text-amber-400">🪙x00</div>
             </div>
             <div>
                 <div class="hud-label">MUNDO</div>
@@ -253,46 +364,46 @@
             </div>
             <div>
                 <div class="hud-label">VIDAS</div>
-                <div id="hudLives" class="hud-value text-rose-400">❤️ x3</div>
+                <div id="hudLives" class="hud-value text-rose-400">❤️x3</div>
             </div>
         </section>
 
         <!-- Contenedor del Lienzo (800x450) -->
-        <div class="canvas-container">
+        <div class="canvas-container" id="canvasContainer">
             <canvas id="gameCanvas" width="800" height="450"></canvas>
             <div class="crt-overlay"></div>
 
             <!-- Pantalla de Inicio / Bienvenida -->
             <div id="startScreen" class="overlay-screen">
-                <div class="bg-red-600 border-4 border-white px-6 py-4 rounded-lg shadow-2xl mb-5 transform -rotate-1">
-                    <h2 class="text-lg sm:text-2xl md:text-3xl text-yellow-300 drop-shadow-[3px_3px_0px_#000]">
+                <div class="bg-red-600 border-4 border-white px-4 py-2.5 sm:px-6 sm:py-3.5 rounded-lg shadow-2xl mb-3 transform -rotate-1">
+                    <h2 class="text-sm sm:text-xl md:text-2xl text-yellow-300 drop-shadow-[3px_3px_0px_#000]">
                         SUPER MARCO BROS.
                     </h2>
-                    <p class="text-[9px] sm:text-xs text-white mt-2 tracking-widest">
-                        EDICIÓN ARCADE HTML5 CANVAS
+                    <p class="text-[8px] sm:text-[10px] text-white mt-1.5 tracking-widest">
+                        MUNDO 1-1 • EDICIÓN RETRO ARCADE
                     </p>
                 </div>
 
-                <div class="max-w-md text-[10px] sm:text-xs text-slate-200 leading-relaxed mb-6 space-y-2 bg-slate-900/90 p-4 rounded-lg border border-slate-700">
-                    <p>🍄 Golpea bloques <span class="text-yellow-400">[?]</span> para obtener monedas y Super Champiñones.</p>
-                    <p>🥾 Salta encima de los <span class="text-amber-400">Goombas</span> para aplastarlos y ganar combos.</p>
-                    <p>🚩 Llega hasta el <span class="text-emerald-400">Asta de la Bandera</span> antes de que acabe el tiempo.</p>
+                <div class="max-w-md text-[8px] sm:text-[10px] text-slate-200 leading-relaxed mb-4 space-y-1.5 bg-slate-900/90 p-3 rounded-lg border border-slate-700">
+                    <p>🍄 Golpea bloques <span class="text-yellow-400">[?]</span> para monedas y Super Champiñones.</p>
+                    <p>🥾 Salta sobre los <span class="text-amber-400">Goombas</span> y llega al <span class="text-emerald-400">Asta de la Bandera</span>.</p>
+                    <p class="text-sky-300">📱 En celular usa los botones táctiles • 💻 En PC usa el teclado</p>
                 </div>
 
-                <button id="btnStartGame" class="retro-btn btn-gold text-xs sm:text-sm px-6 py-4 animate-bounce">
-                    ▶ PRESIONA PARA JUGAR
+                <button id="btnStartGame" class="retro-btn btn-gold text-[10px] sm:text-xs px-5 py-3 animate-bounce">
+                    ▶ TOCA O PRESIONA PARA JUGAR
                 </button>
             </div>
 
             <!-- Pantalla de Game Over / Victoria -->
             <div id="statusScreen" class="overlay-screen hidden">
-                <h2 id="statusTitle" class="text-xl sm:text-3xl text-red-500 mb-3 drop-shadow-[3px_3px_0px_#000]">
+                <h2 id="statusTitle" class="text-lg sm:text-2xl text-red-500 mb-2 drop-shadow-[3px_3px_0px_#000]">
                     GAME OVER
                 </h2>
-                <p id="statusSubtitle" class="text-xs sm:text-sm text-slate-200 mb-4 max-w-md leading-relaxed">
+                <p id="statusSubtitle" class="text-[9px] sm:text-xs text-slate-200 mb-3 max-w-md leading-relaxed">
                     ¡Te has quedado sin vidas!
                 </p>
-                <div id="statusStats" class="bg-slate-900/90 border-2 border-slate-700 rounded-lg p-4 mb-6 text-left text-[10px] sm:text-xs space-y-2 min-w-[240px]">
+                <div id="statusStats" class="bg-slate-900/90 border-2 border-slate-700 rounded-lg p-3 mb-4 text-left text-[9px] sm:text-xs space-y-1.5 min-w-[210px]">
                     <div class="flex justify-between gap-4">
                         <span class="text-slate-400">PUNTUACIÓN:</span>
                         <span id="finalScore" class="text-yellow-300">0</span>
@@ -306,33 +417,55 @@
                         <span id="finalBonus" class="text-emerald-400">0</span>
                     </div>
                 </div>
-                <button id="btnPlayAgain" class="retro-btn btn-gold text-xs sm:text-sm px-6 py-3">
+                <button id="btnPlayAgain" class="retro-btn btn-gold text-[10px] sm:text-xs px-5 py-2.5">
                     ↻ JUGAR DE NUEVO
                 </button>
             </div>
         </div>
 
-        <!-- Controles Táctiles para Móviles y Tablets -->
-        <section id="touchControls" class="hidden items-center justify-between mt-3 px-2" aria-label="Controles táctiles">
-            <div class="flex items-center gap-3">
-                <button id="touchLeft" class="touch-btn" aria-label="Izquierda">◀</button>
-                <button id="touchRight" class="touch-btn" aria-label="Derecha">▶</button>
+        <!-- Mando Virtual Multitáctil (Funciona en Celular, Tablet y Click en PC) -->
+        <section id="gamepadDeck" class="gamepad-deck" aria-label="Controles de juego">
+            <!-- Cruceta Izquierda / Derecha -->
+            <div class="dpad-group">
+                <button type="button" id="touchLeft" data-control="left" class="touch-btn" aria-label="Mover a la izquierda">
+                    ◀
+                    <span class="sub-label">IZQ</span>
+                </button>
+                <button type="button" id="touchRight" data-control="right" class="touch-btn" aria-label="Mover a la derecha">
+                    ▶
+                    <span class="sub-label">DER</span>
+                </button>
             </div>
-            <div class="flex items-center gap-3">
-                <button id="touchRun" class="touch-btn text-xs font-bold bg-amber-500/20 border-amber-400/50" aria-label="Correr">B</button>
-                <button id="touchJump" class="touch-btn text-xs font-bold bg-red-500/30 border-red-400/60" aria-label="Saltar">A</button>
+
+            <!-- Centro: Indicador / Info rápida -->
+            <div class="hidden sm:flex flex-col items-center text-center px-2">
+                <span class="text-[8px] text-slate-400 tracking-widest mb-1">CONTROLADOR</span>
+                <span class="text-[7px] text-slate-500">CELULAR &amp; PC</span>
+            </div>
+
+            <!-- Botones de Acción B (Correr) y A (Saltar) -->
+            <div class="action-group">
+                <button type="button" id="touchRun" data-control="run" class="touch-btn btn-run" aria-label="Correr">
+                    B
+                    <span class="sub-label">CORRER</span>
+                </button>
+                <button type="button" id="touchJump" data-control="jump" class="touch-btn btn-jump" aria-label="Saltar">
+                    A
+                    <span class="sub-label">SALTAR</span>
+                </button>
             </div>
         </section>
 
-        <!-- Leyenda de Controles de Teclado en la parte inferior -->
-        <footer class="mt-3 pt-2 border-t border-slate-800 flex flex-wrap items-center justify-between gap-2 text-[9px] sm:text-[10px] text-slate-400 px-1">
+        <!-- Leyenda de Controles de Teclado para Computadora -->
+        <footer class="desktop-footer hidden md:flex mt-2 pt-1.5 border-t border-slate-800 flex-wrap items-center justify-between gap-2 text-[8px] sm:text-[9px] text-slate-400 px-1">
             <div class="flex flex-wrap items-center gap-3">
-                <span>MOVER: <kbd>◀</kbd> <kbd>▶</kbd> o <kbd>A</kbd> <kbd>D</kbd></span>
+                <span>COMPUTADORA: <kbd>◀</kbd> <kbd>▶</kbd> o <kbd>A</kbd> <kbd>D</kbd></span>
                 <span>SALTAR: <kbd>ESPACIO</kbd> / <kbd>Z</kbd> / <kbd>W</kbd> / <kbd>▲</kbd></span>
                 <span>CORRER: <kbd>SHIFT</kbd> / <kbd>X</kbd></span>
             </div>
             <div class="flex items-center gap-3">
                 <span>PAUSA: <kbd>P</kbd></span>
+                <span>SONIDO: <kbd>M</kbd></span>
                 <span>REINICIAR: <kbd>R</kbd></span>
             </div>
         </footer>
@@ -377,14 +510,18 @@
                 }
 
                 init() {
-                    if (!this.ctx) {
-                        const AudioCtx = window.AudioContext || window.webkitAudioContext;
-                        if (AudioCtx) {
-                            this.ctx = new AudioCtx();
+                    try {
+                        if (!this.ctx) {
+                            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                            if (AudioCtx) {
+                                this.ctx = new AudioCtx();
+                            }
                         }
-                    }
-                    if (this.ctx && this.ctx.state === 'suspended') {
-                        this.ctx.resume();
+                        if (this.ctx && this.ctx.state === 'suspended') {
+                            this.ctx.resume();
+                        }
+                    } catch (e) {
+                        // Ignorar si el dispositivo restringe Web Audio
                     }
                 }
 
@@ -394,7 +531,6 @@
                     return this.muted;
                 }
 
-                // Generador auxiliar de tonos con envolvente
                 playTone(freq, type, duration, startTime = 0, volume = 0.14, slideFreq = null) {
                     if (this.muted || !this.ctx) return;
                     try {
@@ -417,7 +553,7 @@
                         osc.start(now);
                         osc.stop(now + duration);
                     } catch (e) {
-                        // Ignorar errores si el navegador bloquea el audio antes de interacción
+                        // Ignorar errores antes de interacción del usuario
                     }
                 }
 
@@ -430,7 +566,6 @@
 
                 coin() {
                     this.init();
-                    // Clásico sonido B5 -> E6
                     this.playTone(987.77, 'square', 0.08, 0, 0.12);
                     this.playTone(1318.51, 'square', 0.28, 0.08, 0.12);
                 }
@@ -516,9 +651,19 @@
 
             const sfx = new RetroAudio();
 
+            // Desbloqueo global de Web Audio en el primer toque o clic en celular/computadora
+            const unlockAudioOnce = () => {
+                sfx.init();
+            };
+            window.addEventListener('touchstart', unlockAudioOnce, { passive: true, once: true });
+            window.addEventListener('mousedown', unlockAudioOnce, { passive: true, once: true });
+
             // =========================================================================
-            // 2. SISTEMA DE ENTRADA (TECLADO Y CONTROLES TÁCTILES)
+            // 2. SISTEMA DE ENTRADA HÍBRIDO (TECLADO PC + MULTITOUCH CELULAR)
             // =========================================================================
+            const kbState = { left: false, right: false, jump: false, run: false };
+            const touchState = { left: false, right: false, jump: false, run: false };
+
             const keys = {
                 left: false,
                 right: false,
@@ -527,86 +672,152 @@
                 run: false
             };
 
+            const controlButtons = {
+                left: document.getElementById('touchLeft'),
+                right: document.getElementById('touchRight'),
+                run: document.getElementById('touchRun'),
+                jump: document.getElementById('touchJump')
+            };
+
+            function syncInputStates() {
+                const prevJump = keys.jump;
+                keys.left = kbState.left || touchState.left;
+                keys.right = kbState.right || touchState.right;
+                keys.run = kbState.run || touchState.run;
+                keys.jump = kbState.jump || touchState.jump;
+
+                if (keys.jump && !prevJump) {
+                    keys.jumpJustPressed = true;
+                }
+
+                // Actualizar estado visual de los botones en pantalla
+                Object.keys(controlButtons).forEach(k => {
+                    const btn = controlButtons[k];
+                    if (btn) {
+                        btn.classList.toggle('active', Boolean(keys[k]));
+                    }
+                });
+            }
+
+            // --- CONTROLES DE TECLADO (COMPUTADORA) ---
             function handleKeyDown(e) {
                 const code = e.code;
                 if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Space'].includes(code)) {
                     e.preventDefault();
                 }
 
-                if (code === 'ArrowLeft' || code === 'KeyA') keys.left = true;
-                if (code === 'ArrowRight' || code === 'KeyD') keys.right = true;
-                if (code === 'ShiftLeft' || code === 'ShiftRight' || code === 'KeyX') keys.run = true;
+                if (code === 'ArrowLeft' || code === 'KeyA') kbState.left = true;
+                if (code === 'ArrowRight' || code === 'KeyD') kbState.right = true;
+                if (code === 'ShiftLeft' || code === 'ShiftRight' || code === 'KeyX') kbState.run = true;
 
                 if (code === 'Space' || code === 'KeyZ' || code === 'KeyW' || code === 'ArrowUp') {
-                    if (!keys.jump) {
-                        keys.jumpJustPressed = true;
-                    }
-                    keys.jump = true;
+                    kbState.jump = true;
+                }
 
-                    // Si estamos en la pantalla inicial, iniciar con salto
+                if (code === 'Enter' || code === 'Space' || code === 'KeyZ') {
                     if (gameState.mode === 'START') {
                         startGame();
+                    } else if (gameState.mode === 'GAMEOVER' || gameState.mode === 'VICTORY') {
+                        resetFullGame();
                     }
                 }
 
                 if (code === 'KeyP') togglePause();
                 if (code === 'KeyR') resetFullGame();
                 if (code === 'KeyM') sfx.toggleMute();
+
+                syncInputStates();
             }
 
             function handleKeyUp(e) {
                 const code = e.code;
-                if (code === 'ArrowLeft' || code === 'KeyA') keys.left = false;
-                if (code === 'ArrowRight' || code === 'KeyD') keys.right = false;
-                if (code === 'ShiftLeft' || code === 'ShiftRight' || code === 'KeyX') keys.run = false;
+                if (code === 'ArrowLeft' || code === 'KeyA') kbState.left = false;
+                if (code === 'ArrowRight' || code === 'KeyD') kbState.right = false;
+                if (code === 'ShiftLeft' || code === 'ShiftRight' || code === 'KeyX') kbState.run = false;
                 if (code === 'Space' || code === 'KeyZ' || code === 'KeyW' || code === 'ArrowUp') {
-                    keys.jump = false;
+                    kbState.jump = false;
                 }
+                syncInputStates();
             }
 
             window.addEventListener('keydown', handleKeyDown);
             window.addEventListener('keyup', handleKeyUp);
+            window.addEventListener('blur', () => {
+                kbState.left = kbState.right = kbState.jump = kbState.run = false;
+                touchState.left = touchState.right = touchState.jump = touchState.run = false;
+                syncInputStates();
+            });
 
-            // Configuración de botones táctiles
-            function bindTouchButton(id, keyName) {
-                const btn = document.getElementById(id);
-                if (!btn) return;
-                const press = (e) => {
-                    e.preventDefault();
-                    btn.classList.add('active');
-                    if (keyName === 'jump' && !keys.jump) {
-                        keys.jumpJustPressed = true;
-                        if (gameState.mode === 'START') startGame();
+            // --- CONTROLES MULTITÁCTILES AVANZADOS (CELULAR Y TABLET) ---
+            // Permite presionar Izquierda/Derecha con un pulgar y B+A simultáneamente con el otro,
+            // además de deslizar el dedo entre botones sin perder respuesta.
+            const gamepadDeck = document.getElementById('gamepadDeck');
+
+            function evaluateMultiTouch(e) {
+                if (e.cancelable) e.preventDefault();
+                sfx.init();
+
+                const nextTouch = { left: false, right: false, jump: false, run: false };
+                const padMargin = 10; // Margen extra en píxeles para facilitar combos táctiles
+
+                const rects = {};
+                Object.keys(controlButtons).forEach(k => {
+                    if (controlButtons[k]) {
+                        rects[k] = controlButtons[k].getBoundingClientRect();
                     }
-                    keys[keyName] = true;
-                    sfx.init();
-                };
-                const release = (e) => {
+                });
+
+                for (let i = 0; i < e.touches.length; i++) {
+                    const t = e.touches[i];
+                    const tx = t.clientX;
+                    const ty = t.clientY;
+
+                    Object.keys(rects).forEach(k => {
+                        const r = rects[k];
+                        if (
+                            tx >= r.left - padMargin &&
+                            tx <= r.right + padMargin &&
+                            ty >= r.top - padMargin &&
+                            ty <= r.bottom + padMargin
+                        ) {
+                            nextTouch[k] = true;
+                        }
+                    });
+                }
+
+                touchState.left = nextTouch.left;
+                touchState.right = nextTouch.right;
+                touchState.run = nextTouch.run;
+                touchState.jump = nextTouch.jump;
+
+                syncInputStates();
+            }
+
+            gamepadDeck.addEventListener('touchstart', evaluateMultiTouch, { passive: false });
+            gamepadDeck.addEventListener('touchmove', evaluateMultiTouch, { passive: false });
+            gamepadDeck.addEventListener('touchend', evaluateMultiTouch, { passive: false });
+            gamepadDeck.addEventListener('touchcancel', evaluateMultiTouch, { passive: false });
+
+            // Soporte de ratón para los botones en pantalla si se hace clic en computadora
+            Object.keys(controlButtons).forEach(keyName => {
+                const btn = controlButtons[keyName];
+                if (!btn) return;
+                btn.addEventListener('mousedown', (e) => {
                     e.preventDefault();
-                    btn.classList.remove('active');
-                    keys[keyName] = false;
+                    sfx.init();
+                    touchState[keyName] = true;
+                    syncInputStates();
+                });
+                const releaseMouse = (e) => {
+                    e.preventDefault();
+                    if (touchState[keyName]) {
+                        touchState[keyName] = false;
+                        syncInputStates();
+                    }
                 };
-                btn.addEventListener('touchstart', press, { passive: false });
-                btn.addEventListener('touchend', release, { passive: false });
-                btn.addEventListener('touchcancel', release, { passive: false });
-                btn.addEventListener('mousedown', press);
-                btn.addEventListener('mouseup', release);
-                btn.addEventListener('mouseleave', release);
-            }
-
-            bindTouchButton('touchLeft', 'left');
-            bindTouchButton('touchRight', 'right');
-            bindTouchButton('touchJump', 'jump');
-            bindTouchButton('touchRun', 'run');
-
-            // Mostrar los controles táctiles en CUALQUIER dispositivo con pantalla táctil
-            // (celulares, tablets y laptops táctiles), incluso en orientación horizontal.
-            const touchControls = document.getElementById('touchControls');
-            const isTouchDevice = ('ontouchstart' in window) || navigator.maxTouchPoints > 0 || window.matchMedia('(any-pointer: coarse)').matches;
-            if (isTouchDevice) {
-                touchControls.classList.remove('hidden');
-                touchControls.classList.add('flex');
-            }
+                btn.addEventListener('mouseup', releaseMouse);
+                btn.addEventListener('mouseleave', releaseMouse);
+            });
 
             // =========================================================================
             // 3. ESTADO GLOBAL DEL JUEGO Y ENTIDADES DEL NIVEL 1-1
@@ -672,12 +883,10 @@
             let scenery = { clouds: [], hills: [], bushes: [] };
             let flagpole = { x: 3260, y: GROUND_Y - 260, h: 260, flagY: GROUND_Y - 245, castleX: 3350 };
 
-            // Función para añadir texto flotante de puntuación
             function spawnPopup(x, y, text, color = '#ffffff') {
                 popups.push({ x, y, text, color, vy: -1.4, life: 48 });
             }
 
-            // Función para crear partículas de impacto o ladrillo
             function spawnParticles(x, y, color, count = 6) {
                 for (let i = 0; i < count; i++) {
                     const angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.4;
@@ -734,7 +943,6 @@
                 }
 
                 // 2. Segmentos de Suelo Sólido con Fosos (Precipicios)
-                // Definimos tramos en unidades de TILE (32px)
                 const groundSegments = [
                     { start: 0, end: 32 },    // Primer tramo seguro
                     { start: 35, end: 58 },   // Segundo tramo tras primer foso
@@ -752,11 +960,10 @@
                     });
                 });
 
-                // Helper para agregar bloques individuales (ladrillos, bloques ?, bloques duros)
                 const addBlock = (tileX, tileYFromGround, type = 'brick', content = 'coin') => {
                     solids.push({
-                        type, // 'brick', 'question', 'hard'
-                        content, // 'coin', 'mushroom', 'multicoin'
+                        type,
+                        content,
                         coinsLeft: content === 'multicoin' ? 5 : 1,
                         used: false,
                         x: tileX * TILE,
@@ -769,7 +976,6 @@
                     });
                 };
 
-                // Helper para agregar Tuberías Verdes
                 const addPipe = (tileX, heightTiles) => {
                     solids.push({
                         type: 'pipe',
@@ -780,7 +986,6 @@
                     });
                 };
 
-                // Helper para agregar Monedas Flotantes
                 const addCoinArc = (startTileX, tileYFromGround, count) => {
                     for (let i = 0; i < count; i++) {
                         coins.push({
@@ -793,7 +998,6 @@
                     }
                 };
 
-                // Helper para agregar Enemigos Goomba
                 const addGoomba = (tileX, tileYFromGround = 1) => {
                     enemies.push({
                         x: tileX * TILE,
@@ -802,7 +1006,7 @@
                         h: 28,
                         vx: -1.15,
                         vy: 0,
-                        state: 'walk', // 'walk', 'squashed'
+                        state: 'walk',
                         squashTimer: 0,
                         animFrame: 0
                     });
@@ -811,11 +1015,11 @@
                 // --- SECCIÓN 1: Inicio Clásico (Tiles 0 a 32) ---
                 addBlock(8, 4, 'question', 'coin');
                 addBlock(12, 4, 'brick');
-                addBlock(13, 4, 'question', 'mushroom'); // ¡Super Champiñón!
+                addBlock(13, 4, 'question', 'mushroom');
                 addBlock(14, 4, 'brick');
                 addBlock(15, 4, 'question', 'coin');
                 addBlock(16, 4, 'brick');
-                addBlock(14, 8, 'question', 'coin'); // Bloque alto
+                addBlock(14, 8, 'question', 'coin');
 
                 addCoinArc(9, 6, 3);
 
@@ -831,10 +1035,9 @@
                 addCoinArc(41, 5, 4);
 
                 addBlock(44, 4, 'brick');
-                addBlock(45, 4, 'question', 'multicoin'); // Bloque de múltiples monedas
+                addBlock(45, 4, 'question', 'multicoin');
                 addBlock(46, 4, 'brick');
 
-                // Plataforma elevada de ladrillos
                 for (let tx = 47; tx <= 52; tx++) {
                     addBlock(tx, 8, 'brick');
                 }
@@ -851,7 +1054,6 @@
                 addBlock(65, 4, 'question', 'mushroom');
                 addBlock(66, 4, 'question', 'coin');
 
-                // Pirámide pequeña de bloques duros
                 for (let step = 0; step < 3; step++) {
                     for (let h = 1; h <= step + 1; h++) {
                         addBlock(70 + step, h, 'hard');
@@ -875,19 +1077,16 @@
                 addCoinArc(90, 4, 3);
                 addGoomba(93);
 
-                // Gran escalera hacia la bandera (Tiles 95 a 100)
                 for (let col = 0; col < 6; col++) {
                     const height = Math.min(col + 1, 6);
                     for (let row = 1; row <= height; row++) {
                         addBlock(94 + col, row, 'hard');
                     }
                 }
-                // Columna extra en la cima de la escalera
                 for (let row = 1; row <= 6; row++) {
                     addBlock(100, row, 'hard');
                 }
 
-                // Base del asta de la bandera
                 addBlock(102, 1, 'hard');
                 flagpole.x = 102 * TILE + 12;
                 flagpole.y = GROUND_Y - TILE - 250;
@@ -914,17 +1113,14 @@
             function hitBlockFromBelow(block) {
                 if (block.type !== 'question' && block.type !== 'brick') return;
 
-                // Si ya está usado, solo suena el golpe seco
                 if (block.used) {
                     sfx.bump();
                     return;
                 }
 
-                // Animación de rebote del bloque
                 block.bumpVel = -4.5;
                 sfx.bump();
 
-                // ¿Hay algún enemigo justo encima de este bloque? ¡Sale disparado!
                 enemies.forEach(en => {
                     if (en.state === 'walk') {
                         const probe = { x: block.x, y: block.y - 8, w: block.w, h: 10 };
@@ -952,7 +1148,6 @@
                         });
                         spawnPopup(block.x, block.y - 24, '¡SUPER!', '#4ade80');
                     } else {
-                        // Moneda o Multimoneda
                         block.coinsLeft--;
                         if (block.coinsLeft <= 0) {
                             block.used = true;
@@ -960,7 +1155,6 @@
                         collectCoinEffect(block.x + 8, block.y - 16);
                     }
                 } else if (block.type === 'brick') {
-                    // Ladrillo normal: da puntos pequeños y suelta polvo
                     spawnParticles(block.x + 16, block.y + 16, '#c84c0c', 6);
                 }
 
@@ -972,7 +1166,6 @@
                 gameState.coins++;
                 gameState.score += 200;
 
-                // Vida extra cada 50 monedas
                 if (gameState.coins % 50 === 0) {
                     gameState.lives++;
                     sfx.powerupCollect();
@@ -981,7 +1174,6 @@
                     spawnPopup(x, y - 10, '+200', '#fbd000');
                 }
 
-                // Moneda animada que salta del bloque
                 particles.push({
                     type: 'jumpingCoin',
                     x,
@@ -996,17 +1188,15 @@
             function hurtPlayer(instantKill = false) {
                 if (player.invulnerableTimer > 0 && !instantKill) return;
 
-                // Si el jugador tiene el Super Champiñón y no cayó a un foso, vuelve a tamaño normal
                 if (player.isSuper && !instantKill) {
                     player.isSuper = false;
                     player.h = 38;
-                    player.invulnerableTimer = 110; // ~1.8 segundos de parpadeo inmune
+                    player.invulnerableTimer = 110;
                     sfx.powerDown();
                     spawnPopup(player.x, player.y - 12, '¡CUIDADO!', '#f87171');
                     return;
                 }
 
-                // Pierde una vida
                 gameState.lives--;
                 updateHUD();
 
@@ -1031,7 +1221,6 @@
                     return;
                 }
 
-                // Actualizar animaciones de bloques golpeados
                 solids.forEach(b => {
                     if (b.bumpOffset !== undefined && (b.bumpOffset !== 0 || b.bumpVel !== 0)) {
                         b.bumpOffset += b.bumpVel;
@@ -1044,7 +1233,6 @@
                     }
                 });
 
-                // Actualizar partículas y textos flotantes
                 for (let i = particles.length - 1; i >= 0; i--) {
                     const p = particles[i];
                     p.x += p.vx;
@@ -1061,15 +1249,13 @@
                     if (pop.life <= 0) popups.splice(i, 1);
                 }
 
-                // Cinemática al tocar el Asta de la Bandera
                 if (gameState.mode === 'FLAGPOLE') {
                     updateFlagpoleSequence();
                     return;
                 }
 
-                // Temporizador regresivo del nivel
                 gameState.timeAccumulator++;
-                if (gameState.timeAccumulator >= 40) { // ~0.66s como en el Mario clásico
+                if (gameState.timeAccumulator >= 40) {
                     gameState.timeAccumulator = 0;
                     gameState.timeLeft--;
                     updateHUD();
@@ -1079,13 +1265,11 @@
                     }
                 }
 
-                // Checkpoint automático a mitad del nivel
                 if (player.x > 62 * TILE && gameState.checkpointX < 62 * TILE) {
                     gameState.checkpointX = 62 * TILE;
-                    spawnPopup(player.x, player.y - 24, '¡PUNTO DE CONTROL!', '#38bdf8');
+                    spawnPopup(player.x, player.y - 24, '¡CHECKPOINT!', '#38bdf8');
                 }
 
-                // Reducir temporizador de inmunidad
                 if (player.invulnerableTimer > 0) {
                     player.invulnerableTimer--;
                 }
@@ -1095,10 +1279,10 @@
                 const accel = player.onGround ? 0.36 : 0.24;
                 const friction = player.onGround ? 0.82 : 0.93;
 
-                if (keys.left) {
+                if (keys.left && !keys.right) {
                     player.vx -= accel;
                     player.facing = -1;
-                } else if (keys.right) {
+                } else if (keys.right && !keys.left) {
                     player.vx += accel;
                     player.facing = 1;
                 } else {
@@ -1106,11 +1290,9 @@
                     if (Math.abs(player.vx) < 0.08) player.vx = 0;
                 }
 
-                // Limitar velocidad máxima horizontal
                 if (player.vx > maxSpeed) player.vx = maxSpeed;
                 if (player.vx < -maxSpeed) player.vx = -maxSpeed;
 
-                // Coyote Time y Jump Buffer para controles precisos
                 if (player.onGround) {
                     player.coyoteTimer = 7;
                     player.stompCombo = 0;
@@ -1125,18 +1307,16 @@
                     player.jumpBufferTimer--;
                 }
 
-                // Ejecutar salto si hay coyote time y buffer activos
                 if (player.jumpBufferTimer > 0 && player.coyoteTimer > 0) {
                     const speedBoost = Math.abs(player.vx) > 4.0 ? -1.0 : 0;
                     player.vy = -8.6 + speedBoost;
                     player.onGround = false;
                     player.coyoteTimer = 0;
                     player.jumpBufferTimer = 0;
-                    player.jumpHoldTimer = 14; // Permite salto más alto si se mantiene presionado
+                    player.jumpHoldTimer = 14;
                     sfx.jump(player.isSuper);
                 }
 
-                // Altura variable de salto mientras se mantiene la tecla presionada
                 if (keys.jump && player.jumpHoldTimer > 0 && player.vy < 0) {
                     player.vy -= 0.36;
                     player.jumpHoldTimer--;
@@ -1144,14 +1324,12 @@
                     player.jumpHoldTimer = 0;
                 }
 
-                // Aplicar Gravedad
                 player.vy += 0.52;
                 if (player.vy > 11.5) player.vy = 11.5;
 
                 // --- COLISIÓN HORIZONTAL (EJE X) DEL JUGADOR ---
                 player.x += player.vx;
 
-                // No permitir salir por el borde izquierdo de la cámara
                 if (player.x < gameState.cameraX) {
                     player.x = gameState.cameraX;
                     player.vx = 0;
@@ -1178,12 +1356,10 @@
                     const s = solids[i];
                     if (isOverlapping(player, s)) {
                         if (player.vy > 0) {
-                            // Aterrizando sobre plataforma / suelo / tubería
                             player.y = s.y - player.h;
                             player.vy = 0;
                             player.onGround = true;
                         } else if (player.vy < 0) {
-                            // Golpeando bloque desde abajo con la cabeza
                             player.y = s.y + s.h;
                             player.vy = 1.2;
                             player.jumpHoldTimer = 0;
@@ -1192,7 +1368,6 @@
                     }
                 }
 
-                // Animación de pasos del jugador
                 if (Math.abs(player.vx) > 0.25 && player.onGround) {
                     player.animTimer += Math.abs(player.vx) * 0.08;
                     if (player.animTimer >= 1) {
@@ -1203,13 +1378,11 @@
                     player.animFrame = 0;
                 }
 
-                // Caída en un precipicio (foso)
                 if (player.y > GAME_HEIGHT + 35) {
                     hurtPlayer(true);
                     return;
                 }
 
-                // Actualizar Cámara con desplazamiento suave (Side-Scrolling)
                 const targetCamX = player.x - GAME_WIDTH * 0.34;
                 if (targetCamX > gameState.cameraX) {
                     gameState.cameraX += (targetCamX - gameState.cameraX) * 0.18;
@@ -1235,7 +1408,6 @@
                     m.vy += 0.42;
                     if (m.vy > 9) m.vy = 9;
 
-                    // Eje X del champiñón
                     m.x += m.vx;
                     for (let j = 0; j < solids.length; j++) {
                         const s = solids[j];
@@ -1246,7 +1418,6 @@
                         }
                     }
 
-                    // Eje Y del champiñón
                     m.y += m.vy;
                     for (let j = 0; j < solids.length; j++) {
                         const s = solids[j];
@@ -1258,7 +1429,6 @@
                         }
                     }
 
-                    // Recolección del Super Champiñón por el jugador
                     if (isOverlapping(player, m)) {
                         sfx.powerupCollect();
                         gameState.score += 1000;
@@ -1282,7 +1452,6 @@
                 for (let i = enemies.length - 1; i >= 0; i--) {
                     const en = enemies[i];
 
-                    // Solo activar enemigos cercanos a la vista de cámara
                     if (Math.abs(en.x - player.x) > GAME_WIDTH * 1.1) continue;
 
                     if (en.state === 'squashed') {
@@ -1293,7 +1462,6 @@
                         continue;
                     }
 
-                    // Gravedad y patrullaje del Goomba
                     en.vy += 0.48;
                     if (en.vy > 10) en.vy = 10;
 
@@ -1303,7 +1471,7 @@
                         if (isOverlapping(en, s)) {
                             if (en.vx > 0) en.x = s.x - en.w;
                             else en.x = s.x + s.w;
-                            en.vx *= -1; // Rebota contra tuberías o escalones
+                            en.vx *= -1;
                         }
                     }
 
@@ -1320,7 +1488,6 @@
                         }
                     }
 
-                    // Evitar que los Goombas caigan en precipicios (dan la vuelta en el borde)
                     if (onSolid) {
                         const probeX = en.vx > 0 ? en.x + en.w + 2 : en.x - 2;
                         const probeY = en.y + en.h + 4;
@@ -1337,16 +1504,14 @@
                         }
                     }
 
-                    // Colisión Jugador vs Goomba
                     if (isOverlapping(player, en)) {
                         const playerBottom = player.y + player.h;
                         const enemyTop = en.y;
 
-                        // Si el jugador cae desde arriba sobre la mitad superior del Goomba -> ¡APLASTADO!
                         if (player.vy > 0 && playerBottom - player.vy <= enemyTop + 14) {
                             en.state = 'squashed';
                             en.squashTimer = 30;
-                            player.vy = keys.jump ? -8.2 : -6.2; // Rebote al aplastar
+                            player.vy = keys.jump ? -8.2 : -6.2;
                             player.stompCombo++;
                             const points = 100 * Math.pow(2, Math.min(player.stompCombo - 1, 4));
                             gameState.score += points;
@@ -1355,7 +1520,6 @@
                             spawnParticles(en.x + 14, en.y + 14, '#fcd34d', 6);
                             updateHUD();
                         } else {
-                            // Contacto lateral: daña al jugador
                             hurtPlayer(false);
                         }
                     }
@@ -1371,7 +1535,6 @@
                     player.x = flagpole.x - player.w + 6;
                     sfx.flagpole();
 
-                    // Puntos según la altura alcanzada en el asta
                     const heightRatio = 1 - Math.max(0, Math.min(1, (player.y - flagpole.y) / flagpole.h));
                     const poleBonus = Math.round(heightRatio * 2000 / 100) * 100 + 200;
                     gameState.score += poleBonus;
@@ -1380,11 +1543,9 @@
                 }
             }
 
-            // Secuencia de bajada por la bandera y entrada al castillo
             function updateFlagpoleSequence() {
                 gameState.flagSlideTimer++;
 
-                // Bajar al jugador y la bandera hasta la base del asta
                 const bottomY = GROUND_Y - TILE - player.h;
                 if (player.y < bottomY) {
                     player.y += 3.5;
@@ -1394,7 +1555,6 @@
                     flagpole.flagY += 3.8;
                 }
 
-                // Una vez abajo, caminar hacia la puerta del castillo
                 if (gameState.flagSlideTimer > 55) {
                     player.facing = 1;
                     player.onGround = true;
@@ -1404,7 +1564,6 @@
                         player.y = GROUND_Y - player.h;
                         player.animFrame = Math.floor(gameState.globalTick / 5) % 3;
                     } else {
-                        // Fuegos artificiales sobre el castillo y pantalla de Victoria
                         if (gameState.flagSlideTimer === 115) {
                             sfx.victory();
                             spawnParticles(flagpole.castleX + 40, GROUND_Y - 190, '#fbd000', 12);
@@ -1424,7 +1583,6 @@
             function draw() {
                 ctx.clearRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
 
-                // 1. Cielo Azul Clásico con ligero degradado
                 const skyGrad = ctx.createLinearGradient(0, 0, 0, GAME_HEIGHT);
                 skyGrad.addColorStop(0, '#4f86f7');
                 skyGrad.addColorStop(1, '#79a6fe');
@@ -1434,34 +1592,28 @@
                 ctx.save();
                 const camX = Math.floor(gameState.cameraX);
 
-                // 2. Nubes (con Parallax suave al 0.45x)
                 scenery.clouds.forEach(c => {
                     const screenX = Math.floor(c.x - camX * 0.45);
                     if (screenX + c.w < -40 || screenX > GAME_WIDTH + 40) return;
                     drawCloud(screenX, c.y, c.w);
                 });
 
-                // 3. Colinas Clásicas (con Parallax al 0.75x)
                 scenery.hills.forEach(h => {
                     const screenX = Math.floor(h.x - camX * 0.75);
                     if (screenX + h.w < -40 || screenX > GAME_WIDTH + 40) return;
                     drawHill(screenX, GROUND_Y, h.w, h.h);
                 });
 
-                // Aplicar traslación de la cámara principal (1.0x)
                 ctx.translate(-camX, 0);
 
-                // 4. Arbustos decorativos sobre el suelo
                 scenery.bushes.forEach(b => {
                     if (b.x + b.w < camX - 20 || b.x > camX + GAME_WIDTH + 20) return;
                     drawBush(b.x, GROUND_Y, b.w);
                 });
 
-                // 5. Castillo Final y Asta de la Bandera
                 drawCastle(flagpole.castleX, GROUND_Y);
                 drawFlagpole();
 
-                // 6. Bloques, Suelo y Tuberías
                 solids.forEach(s => {
                     if (s.x + s.w < camX - 32 || s.x > camX + GAME_WIDTH + 32) return;
                     if (s.type === 'ground') drawGroundSegment(s);
@@ -1471,32 +1623,26 @@
                     else if (s.type === 'pipe') drawPipe(s);
                 });
 
-                // 7. Monedas Flotantes
                 coins.forEach(c => {
                     if (c.collected) return;
                     if (c.x + c.w < camX || c.x > camX + GAME_WIDTH) return;
                     drawCoin(c.x, c.y);
                 });
 
-                // 8. Super Champiñones
                 mushrooms.forEach(m => {
                     drawMushroom(m.x, m.y, m.w, m.h);
                 });
 
-                // 9. Enemigos (Goombas)
                 enemies.forEach(en => {
                     if (en.x + en.w < camX - 32 || en.x > camX + GAME_WIDTH + 32) return;
                     drawGoomba(en);
                 });
 
-                // 10. Jugador (Marco Bros)
-                // Si ya entró al castillo al final, ocultarlo detrás de la puerta
                 const enteredCastle = gameState.mode === 'FLAGPOLE' && player.x >= flagpole.castleX + 58;
                 if (!enteredCastle) {
                     drawPlayer();
                 }
 
-                // 11. Partículas y Textos de Puntuación Flotantes
                 particles.forEach(p => {
                     if (p.type === 'jumpingCoin') {
                         drawCoin(p.x, p.y);
@@ -1519,17 +1665,16 @@
 
                 ctx.restore();
 
-                // Si el juego está en PAUSA, mostrar aviso en el lienzo
                 if (gameState.mode === 'PAUSED') {
                     ctx.fillStyle = 'rgba(0, 0, 0, 0.55)';
                     ctx.fillRect(0, 0, GAME_WIDTH, GAME_HEIGHT);
-                    ctx.font = '24px "Press Start 2P", monospace';
+                    ctx.font = '22px "Press Start 2P", monospace';
                     ctx.fillStyle = '#fbd000';
                     ctx.textAlign = 'center';
                     ctx.fillText('JUEGO EN PAUSA', GAME_WIDTH / 2, GAME_HEIGHT / 2 - 10);
-                    ctx.font = '11px "Press Start 2P", monospace';
+                    ctx.font = '10px "Press Start 2P", monospace';
                     ctx.fillStyle = '#ffffff';
-                    ctx.fillText('PULSA PAUSA O [P] PARA CONTINUAR', GAME_WIDTH / 2, GAME_HEIGHT / 2 + 24);
+                    ctx.fillText('TOCA PAUSA O PRESIONA [P] PARA SEGUIR', GAME_WIDTH / 2, GAME_HEIGHT / 2 + 24);
                     ctx.textAlign = 'left';
                 }
             }
@@ -1542,7 +1687,6 @@
                 ctx.roundRect(x, y + 10, w, 24, 12);
                 ctx.roundRect(x + 14, y, w - 28, 26, 12);
                 ctx.fill();
-                // Sombra inferior suave de la nube
                 ctx.fillStyle = '#dbeafe';
                 ctx.fillRect(x + 10, y + 28, w - 20, 4);
             }
@@ -1558,7 +1702,6 @@
                 ctx.fill();
                 ctx.stroke();
 
-                // Motas claras estilo Super Mario World / SMB
                 ctx.fillStyle = '#4ade80';
                 ctx.fillRect(x + w * 0.45, groundY - h * 0.65, 8, 12);
                 ctx.fillRect(x + w * 0.32, groundY - h * 0.35, 8, 10);
@@ -1585,11 +1728,9 @@
                         const bx = seg.x + c * TILE;
                         const by = seg.y + r * TILE;
 
-                        // Bloque de tierra/roca rojiza clásica
                         ctx.fillStyle = '#c84c0c';
                         ctx.fillRect(bx, by, TILE, TILE);
 
-                        // Bordes de relieve
                         ctx.fillStyle = '#fcbcb0';
                         ctx.fillRect(bx + 2, by + 2, TILE - 4, 3);
                         ctx.fillRect(bx + 2, by + 2, 3, TILE - 4);
@@ -1598,7 +1739,6 @@
                         ctx.fillRect(bx + 2, by + TILE - 4, TILE - 4, 3);
                         ctx.fillRect(bx + TILE - 4, by + 2, 3, TILE - 4);
 
-                        // Grietas internas de bloque clásico
                         ctx.fillStyle = '#000000';
                         ctx.fillRect(bx, by, TILE, 2);
                         ctx.fillRect(bx, by, 2, TILE);
@@ -1613,7 +1753,6 @@
                 ctx.fillStyle = '#b84010';
                 ctx.fillRect(x, y, TILE, TILE);
 
-                // Líneas de mortero
                 ctx.fillStyle = '#000000';
                 ctx.strokeRect(x + 1, y + 1, TILE - 2, TILE - 2);
                 ctx.fillRect(x, y + 15, TILE, 2);
@@ -1621,7 +1760,6 @@
                 ctx.fillRect(x + 7, y + 17, 2, 15);
                 ctx.fillRect(x + 23, y + 17, 2, 15);
 
-                // Brillo superior en ladrillos
                 ctx.fillStyle = '#f59e0b';
                 ctx.fillRect(x + 2, y + 2, 12, 2);
                 ctx.fillRect(x + 18, y + 2, 12, 2);
@@ -1632,14 +1770,12 @@
                 const y = b.y;
 
                 if (b.used) {
-                    // Bloque usado (marrón apagado con remaches)
                     ctx.fillStyle = '#78350f';
                     ctx.fillRect(x, y, TILE, TILE);
                     ctx.strokeStyle = '#000000';
                     ctx.lineWidth = 2;
                     ctx.strokeRect(x + 1, y + 1, TILE - 2, TILE - 2);
                 } else {
-                    // Bloque ? dorado con parpadeo clásico
                     const pulse = Math.floor(gameState.globalTick / 12) % 3;
                     const colors = ['#f59e0b', '#fbbf24', '#d97706'];
                     ctx.fillStyle = colors[pulse];
@@ -1649,7 +1785,6 @@
                     ctx.lineWidth = 2;
                     ctx.strokeRect(x + 1, y + 1, TILE - 2, TILE - 2);
 
-                    // Signo de interrogación
                     ctx.font = '16px "Press Start 2P", monospace';
                     ctx.fillStyle = '#451a03';
                     ctx.fillText('?', x + 9, y + 24);
@@ -1657,7 +1792,6 @@
                     ctx.fillText('?', x + 7, y + 22);
                 }
 
-                // Remaches en las 4 esquinas
                 ctx.fillStyle = '#000000';
                 ctx.fillRect(x + 3, y + 3, 3, 3);
                 ctx.fillRect(x + TILE - 6, y + 3, 3, 3);
@@ -1669,7 +1803,6 @@
                 ctx.fillStyle = '#9a3412';
                 ctx.fillRect(x, y, TILE, TILE);
 
-                // Biselado 3D estilo escalón de Mario
                 ctx.fillStyle = '#fdba74';
                 ctx.fillRect(x + 2, y + 2, TILE - 4, 3);
                 ctx.fillRect(x + 2, y + 2, 3, TILE - 4);
@@ -1687,11 +1820,9 @@
                 const { x, y, w, h } = p;
                 const lipH = 26;
 
-                // Cuerpo cilíndrico de la tubería
                 ctx.fillStyle = '#16a34a';
                 ctx.fillRect(x + 4, y + lipH, w - 8, h - lipH);
 
-                // Brillos verticales del cuerpo
                 ctx.fillStyle = '#86efac';
                 ctx.fillRect(x + 10, y + lipH, 8, h - lipH);
                 ctx.fillStyle = '#14532d';
@@ -1701,7 +1832,6 @@
                 ctx.lineWidth = 2;
                 ctx.strokeRect(x + 4, y + lipH, w - 8, h - lipH);
 
-                // Boca superior (borde ancho)
                 ctx.fillStyle = '#16a34a';
                 ctx.fillRect(x, y, w, lipH);
                 ctx.fillStyle = '#86efac';
@@ -1729,14 +1859,12 @@
             }
 
             function drawMushroom(x, y, w, h) {
-                // Tallo del champiñón
                 ctx.fillStyle = '#fde68a';
                 ctx.fillRect(x + 6, y + 14, w - 12, 14);
                 ctx.strokeStyle = '#000';
                 ctx.lineWidth = 2;
                 ctx.strokeRect(x + 6, y + 14, w - 12, 14);
 
-                // Sombrero rojo con lunares blancos
                 ctx.fillStyle = '#ef4444';
                 ctx.beginPath();
                 ctx.roundRect(x, y, w, 16, 8);
@@ -1750,10 +1878,9 @@
             }
 
             function drawGoomba(en) {
-                const { x, y, w, h } = en;
+                const { x, y, w } = en;
 
                 if (en.state === 'squashed') {
-                    // Goomba aplastado
                     ctx.fillStyle = '#9a3412';
                     ctx.fillRect(x, y + 16, w, 12);
                     ctx.strokeStyle = '#000';
@@ -1763,7 +1890,6 @@
 
                 const step = Math.floor(gameState.globalTick / 10) % 2;
 
-                // Pies animados
                 ctx.fillStyle = '#000000';
                 if (step === 0) {
                     ctx.fillRect(x + 3, y + 22, 9, 6);
@@ -1773,11 +1899,9 @@
                     ctx.fillRect(x + 16, y + 22, 9, 6);
                 }
 
-                // Tallo crema
                 ctx.fillStyle = '#fed7aa';
                 ctx.fillRect(x + 7, y + 16, 14, 7);
 
-                // Cabeza de hongo marrón
                 ctx.fillStyle = '#b45309';
                 ctx.beginPath();
                 ctx.roundRect(x, y + 2, w, 16, 8);
@@ -1786,34 +1910,29 @@
                 ctx.lineWidth = 2;
                 ctx.stroke();
 
-                // Ojos enfadados
                 ctx.fillStyle = '#ffffff';
                 ctx.fillRect(x + 6, y + 8, 4, 6);
                 ctx.fillRect(x + 18, y + 8, 4, 6);
                 ctx.fillStyle = '#000000';
                 ctx.fillRect(x + 8, y + 10, 2, 4);
                 ctx.fillRect(x + 18, y + 10, 2, 4);
-                // Cejas
                 ctx.fillRect(x + 5, y + 6, 6, 2);
                 ctx.fillRect(x + 17, y + 6, 6, 2);
             }
 
             function drawFlagpole() {
-                // Mástil verde claro
                 ctx.fillStyle = '#bbf7d0';
                 ctx.fillRect(flagpole.x, flagpole.y, 6, flagpole.h);
                 ctx.strokeStyle = '#064e3b';
                 ctx.lineWidth = 2;
                 ctx.strokeRect(flagpole.x, flagpole.y, 6, flagpole.h);
 
-                // Esfera dorada en la punta del asta
                 ctx.fillStyle = '#fbd000';
                 ctx.beginPath();
                 ctx.arc(flagpole.x + 3, flagpole.y - 4, 9, 0, Math.PI * 2);
                 ctx.fill();
                 ctx.stroke();
 
-                // Bandera triangular con emblema de estrella
                 ctx.fillStyle = '#22c55e';
                 ctx.beginPath();
                 ctx.moveTo(flagpole.x, flagpole.flagY);
@@ -1832,18 +1951,15 @@
                 const h = 128;
                 const y = groundY - h;
 
-                // Cuerpo principal de ladrillo del castillo
                 ctx.fillStyle = '#b84010';
                 ctx.fillRect(x, y + 40, w, h - 40);
                 ctx.strokeStyle = '#000';
                 ctx.lineWidth = 2;
                 ctx.strokeRect(x, y + 40, w, h - 40);
 
-                // Torre superior central
                 ctx.fillRect(x + 28, y, w - 56, 42);
                 ctx.strokeRect(x + 28, y, w - 56, 42);
 
-                // Almenas del castillo
                 for (let i = 0; i < 5; i++) {
                     ctx.fillRect(x + i * 30, y + 28, 20, 12);
                     ctx.strokeRect(x + i * 30, y + 28, 20, 12);
@@ -1853,20 +1969,16 @@
                     ctx.strokeRect(x + 28 + i * 32, y - 12, 20, 12);
                 }
 
-                // Ventanas superiores oscuras
                 ctx.fillStyle = '#090d16';
                 ctx.fillRect(x + 44, y + 14, 14, 20);
                 ctx.fillRect(x + 82, y + 14, 14, 20);
 
-                // Gran arco de entrada al castillo
                 ctx.beginPath();
                 ctx.roundRect(x + 50, groundY - 52, 40, 52, [20, 20, 0, 0]);
                 ctx.fill();
             }
 
-            // Dibujar al protagonista (Marco) con su gorra roja, bigote y overol azul
             function drawPlayer() {
-                // Efecto de parpadeo cuando está invulnerable tras recibir daño
                 if (player.invulnerableTimer > 0 && Math.floor(player.invulnerableTimer / 4) % 2 === 0) {
                     return;
                 }
@@ -1882,17 +1994,14 @@
                 const x = -w / 2;
                 const y = -h / 2;
 
-                // Botas marrones (animadas al caminar o saltar)
                 ctx.fillStyle = '#78350f';
                 const stepOffset = !player.onGround ? 4 : (player.animFrame === 1 ? 3 : (player.animFrame === 2 ? -3 : 0));
                 ctx.fillRect(x + 2 - stepOffset, y + h - 8, 10, 8);
                 ctx.fillRect(x + w - 12 + stepOffset, y + h - 8, 10, 8);
 
-                // Camisa roja base
                 ctx.fillStyle = '#e52521';
                 ctx.fillRect(x + 2, y + 14, w - 4, h - 22);
 
-                // Overol azul con botones amarillos
                 ctx.fillStyle = '#1d4ed8';
                 ctx.fillRect(x + 5, y + h - 22, w - 10, 14);
                 ctx.fillRect(x + 7, y + 14, 4, 10);
@@ -1902,28 +2011,24 @@
                 ctx.fillRect(x + 8, y + h - 18, 3, 3);
                 ctx.fillRect(x + w - 11, y + h - 18, 3, 3);
 
-                // Brazos / Guantes blancos
                 ctx.fillStyle = '#fef3c7';
                 const armY = !player.onGround ? y + 10 : y + 18;
                 ctx.fillRect(x - 1, armY, 5, 7);
                 ctx.fillRect(x + w - 4, armY, 5, 7);
 
-                // Rostro color piel
                 ctx.fillStyle = '#fdba74';
                 ctx.fillRect(x + 4, y + 5, w - 7, 12);
 
-                // Ojo y Bigote clásico
                 ctx.fillStyle = '#000000';
-                ctx.fillRect(x + w - 9, y + 7, 3, 4); // Ojo
+                ctx.fillRect(x + w - 9, y + 7, 3, 4);
                 ctx.fillStyle = '#451a03';
-                ctx.fillRect(x + w - 11, y + 13, 10, 3); // Bigote
+                ctx.fillRect(x + w - 11, y + 13, 10, 3);
                 ctx.fillStyle = '#fdba74';
-                ctx.fillRect(x + w - 4, y + 9, 5, 4); // Nariz
+                ctx.fillRect(x + w - 4, y + 9, 5, 4);
 
-                // Gorra Roja con visera
                 ctx.fillStyle = '#e52521';
                 ctx.fillRect(x + 2, y, w - 4, 6);
-                ctx.fillRect(x + 2, y + 4, w + 2, 3); // Visera hacia adelante
+                ctx.fillRect(x + 2, y + 4, w + 2, 3);
 
                 ctx.restore();
             }
@@ -1933,12 +2038,13 @@
             // =========================================================================
             function updateHUD() {
                 hudScore.textContent = String(gameState.score).padStart(6, '0');
-                hudCoins.textContent = `🪙 x${String(gameState.coins).padStart(2, '0')}`;
+                hudCoins.textContent = `🪙x${String(gameState.coins).padStart(2, '0')}`;
                 hudTime.textContent = String(Math.max(0, gameState.timeLeft)).padStart(3, '0');
-                hudLives.textContent = `❤️ x${Math.max(0, gameState.lives)}`;
+                hudLives.textContent = `❤️x${Math.max(0, gameState.lives)}`;
             }
 
-            function startGame() {
+            function startGame(e) {
+                if (e && e.cancelable) e.preventDefault();
                 sfx.init();
                 startScreen.classList.add('hidden');
                 statusScreen.classList.add('hidden');
@@ -1946,7 +2052,9 @@
                 gameState.mode = 'PLAYING';
             }
 
-            function resetFullGame() {
+            function resetFullGame(e) {
+                if (e && e.cancelable) e.preventDefault();
+                sfx.init();
                 gameState.score = 0;
                 gameState.coins = 0;
                 gameState.lives = 3;
@@ -1963,7 +2071,9 @@
                 gameState.mode = 'PLAYING';
             }
 
-            function togglePause() {
+            function togglePause(e) {
+                if (e && e.cancelable) e.preventDefault();
+                sfx.init();
                 if (gameState.mode === 'PLAYING') {
                     gameState.mode = 'PAUSED';
                 } else if (gameState.mode === 'PAUSED') {
@@ -1975,7 +2085,7 @@
                 gameState.mode = 'GAMEOVER';
                 sfx.gameOver();
                 statusTitle.textContent = 'GAME OVER';
-                statusTitle.className = 'text-xl sm:text-3xl text-red-500 mb-3 drop-shadow-[3px_3px_0px_#000]';
+                statusTitle.className = 'text-lg sm:text-2xl text-red-500 mb-2 drop-shadow-[3px_3px_0px_#000]';
                 statusSubtitle.textContent = reasonText;
                 finalScore.textContent = gameState.score;
                 finalCoins.textContent = gameState.coins;
@@ -1990,7 +2100,7 @@
                 updateHUD();
 
                 statusTitle.textContent = '¡NIVEL COMPLETADO!';
-                statusTitle.className = 'text-xl sm:text-3xl text-emerald-400 mb-3 drop-shadow-[3px_3px_0px_#000]';
+                statusTitle.className = 'text-lg sm:text-2xl text-emerald-400 mb-2 drop-shadow-[3px_3px_0px_#000]';
                 statusSubtitle.textContent = '¡Felicidades! Has superado el Mundo 1-1 y llegado al castillo.';
                 finalScore.textContent = gameState.score;
                 finalCoins.textContent = gameState.coins;
@@ -1998,18 +2108,28 @@
                 statusScreen.classList.remove('hidden');
             }
 
-            // Eventos de botones de la interfaz
-            document.getElementById('btnStartGame').addEventListener('click', startGame);
-            document.getElementById('btnPlayAgain').addEventListener('click', resetFullGame);
-            document.getElementById('btnRestart').addEventListener('click', () => {
-                sfx.init();
-                resetFullGame();
-            });
-            document.getElementById('btnPause').addEventListener('click', togglePause);
-            document.getElementById('btnAudio').addEventListener('click', () => {
+            // Helper para vincular tanto click (PC) como touchend (Celular) sin retardo
+            function bindTapOrClick(element, handler) {
+                if (!element) return;
+                element.addEventListener('click', handler);
+                element.addEventListener('touchend', (e) => {
+                    e.stopPropagation();
+                    handler(e);
+                }, { passive: false });
+            }
+
+            bindTapOrClick(document.getElementById('btnStartGame'), startGame);
+            bindTapOrClick(document.getElementById('btnPlayAgain'), resetFullGame);
+            bindTapOrClick(document.getElementById('btnRestart'), resetFullGame);
+            bindTapOrClick(document.getElementById('btnPause'), togglePause);
+            bindTapOrClick(document.getElementById('btnAudio'), (e) => {
+                if (e && e.cancelable) e.preventDefault();
                 sfx.init();
                 sfx.toggleMute();
             });
+
+            // También permitir tocar directamente el cartel de inicio/fin en celular
+            bindTapOrClick(startScreen, startGame);
 
             // =========================================================================
             // 10. INICIALIZACIÓN Y BUCLE PRINCIPAL (REQUESTANIMATIONFRAME)
